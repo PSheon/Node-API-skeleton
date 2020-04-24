@@ -8,11 +8,19 @@ const cors = require('cors')
 const passport = require('passport')
 const app = express()
 const i18n = require('i18n')
-const initMongo = require('./config/mongo')
 const path = require('path')
 
+const statusMonitor = require('./app/middleware/status-monitor')
+const statusMonitorConfig = require('./config/statusMonitor')
+const initMongo = require('./config/mongo')
+
 // Setup express server port from ENV, default: 3000
-app.set('port', process.env.PORT || 3000)
+app.set('port', process.env.API_PORT || 3000)
+
+// API Status Monitor
+if (process.env.ENABLED_STATUS_MONITOR === 'true') {
+  app.use(statusMonitor(statusMonitorConfig()))
+}
 
 // Enable only in development HTTP request logger middleware
 if (process.env.NODE_ENV === 'development') {
