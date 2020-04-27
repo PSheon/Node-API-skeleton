@@ -9,6 +9,8 @@ const passport = require('passport')
 const app = express()
 const i18n = require('i18n')
 const path = require('path')
+const swaggerJsdoc = require('swagger-jsdoc')
+const swaggerUi = require('swagger-ui-express')
 
 const statusMonitor = require('./app/middleware/status-monitor')
 const statusMonitorConfig = require('./config/statusMonitor')
@@ -20,6 +22,26 @@ app.set('port', process.env.API_PORT || 3000)
 // API Status Monitor
 if (process.env.ENABLED_STATUS_MONITOR === 'true') {
   app.use(statusMonitor(statusMonitorConfig()))
+}
+
+// API DOCS UI
+if (process.env.ENABLED_DOCS_UI === 'true') {
+  app.use(
+    '/api-docs',
+    swaggerUi.serve,
+    swaggerUi.setup(
+      swaggerJsdoc({
+        swaggerDefinition: {
+          info: {
+            title: 'API Skeleton',
+            version: '1.0.0',
+            description: 'Generate API document with swagger'
+          }
+        },
+        apis: ['./docs/*.yaml']
+      })
+    )
+  )
 }
 
 // Enable only in development HTTP request logger middleware
