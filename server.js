@@ -11,21 +11,26 @@ const i18n = require('i18n')
 const path = require('path')
 const swaggerJsdoc = require('swagger-jsdoc')
 const swaggerUi = require('swagger-ui-express')
+const FileStreamRotator = require('file-stream-rotator')
 
+const setupDirectory = require('./utils/setup-environment-directory')
 const statusMonitor = require('./app/middleware/status-monitor')
 const statusMonitorConfig = require('./config/statusMonitor')
 const initMongo = require('./config/mongo')
+
+// Setup necessary directory
+setupDirectory({ baseDirName: __dirname })
 
 // Setup express server port from ENV, default: 3000
 app.set('port', process.env.API_PORT || 3000)
 
 // API Status Monitor
-if (process.env.ENABLED_STATUS_MONITOR === 'true') {
+if (process.env.ENABLE_STATUS_MONITOR === 'true') {
   app.use(statusMonitor(statusMonitorConfig()))
 }
 
 // API DOCS UI
-if (process.env.ENABLED_DOCS_UI === 'true') {
+if (process.env.ENABLE_DOCS_UI === 'true') {
   app.use(
     '/api-docs',
     swaggerUi.serve,
@@ -47,6 +52,17 @@ if (process.env.ENABLED_DOCS_UI === 'true') {
 // Enable only in development HTTP request logger middleware
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'))
+} else if (process.env.ENABLE_LOG_RECORDER === 'true') {
+  app.use(
+    morgan('combined', {
+      stream: FileStreamRotator.getStream({
+        date_format: 'YYYYMMDD', // eslint-disable-line
+        filename: path.join(path.join(__dirname, 'logs'), 'access-%DATE%.log'),
+        frequency: 'daily',
+        verbose: false
+      })
+    })
+  )
 }
 
 // Redis cache enabled by env variable
