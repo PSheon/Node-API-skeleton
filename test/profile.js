@@ -20,7 +20,7 @@ describe('*********** PROFILE ***********', () => {
     it('it should GET token', (done) => {
       chai
         .request(server)
-        .post('/login')
+        .post('/auth/login')
         .send(loginDetails)
         .end((err, res) => {
           res.should.have.status(200)
@@ -35,7 +35,7 @@ describe('*********** PROFILE ***********', () => {
     it('it should NOT be able to consume the route since no token was sent', (done) => {
       chai
         .request(server)
-        .get('/profile')
+        .get('/api/profile')
         .end((err, res) => {
           res.should.have.status(401)
           done()
@@ -44,7 +44,7 @@ describe('*********** PROFILE ***********', () => {
     it('it should GET profile', (done) => {
       chai
         .request(server)
-        .get('/profile')
+        .get('/api/profile')
         .set('Authorization', `Bearer ${token}`)
         .end((err, res) => {
           res.should.have.status(200)
@@ -59,7 +59,7 @@ describe('*********** PROFILE ***********', () => {
       const user = {}
       chai
         .request(server)
-        .patch('/profile')
+        .patch('/api/profile')
         .set('Authorization', `Bearer ${token}`)
         .send(user)
         .end((err, res) => {
@@ -80,7 +80,7 @@ describe('*********** PROFILE ***********', () => {
       }
       chai
         .request(server)
-        .patch('/profile')
+        .patch('/api/profile')
         .set('Authorization', `Bearer ${token}`)
         .send(user)
         .end((err, res) => {
@@ -101,7 +101,7 @@ describe('*********** PROFILE ***********', () => {
       }
       chai
         .request(server)
-        .patch('/profile')
+        .patch('/api/profile')
         .set('Authorization', `Bearer ${token}`)
         .send(user)
         .end((err, res) => {
@@ -122,7 +122,7 @@ describe('*********** PROFILE ***********', () => {
       }
       chai
         .request(server)
-        .patch('/profile')
+        .patch('/api/profile')
         .set('Authorization', `Bearer ${token}`)
         .send(user)
         .end((err, res) => {
@@ -144,7 +144,7 @@ describe('*********** PROFILE ***********', () => {
       }
       chai
         .request(server)
-        .post('/profile/changePassword')
+        .post('/api/profile/changePassword')
         .set('Authorization', `Bearer ${token}`)
         .send(data)
         .end((err, res) => {
@@ -164,7 +164,7 @@ describe('*********** PROFILE ***********', () => {
       }
       chai
         .request(server)
-        .post('/profile/changePassword')
+        .post('/api/profile/changePassword')
         .set('Authorization', `Bearer ${token}`)
         .send(data)
         .end((err, res) => {
@@ -184,7 +184,7 @@ describe('*********** PROFILE ***********', () => {
       }
       chai
         .request(server)
-        .post('/profile/changePassword')
+        .post('/api/profile/changePassword')
         .set('Authorization', `Bearer ${token}`)
         .send(data)
         .end((err, res) => {

@@ -1,8 +1,9 @@
 require('dotenv-safe').config()
-const initMongo = require('./config/mongo')
+const initMongo = require('../../config/mongo')
+const path = require('path')
 const fs = require('fs')
-const modelsPath = `./app/models`
-const { removeExtensionFromFile } = require('./app/middleware/utils')
+const { removeExtensionFromFile } = require('../../app/middleware/utils')
+const modelsPath = path.resolve(__dirname, '..', '../', 'app', 'models')
 
 initMongo()
 
@@ -13,7 +14,7 @@ const models = fs.readdirSync(modelsPath).filter((file) => {
 
 const deleteModelFromDB = (model) => {
   return new Promise((resolve, reject) => {
-    model = require(`./app/models/${model}`)
+    model = require(`../../app/models/${model}`)
     model.deleteMany({}, (err, row) => {
       if (err) {
         reject(err)
@@ -30,7 +31,7 @@ const clean = async () => {
       async (model) => await deleteModelFromDB(model)
     )
     await Promise.all(promiseArray)
-    console.log('Cleanup complete!')
+    console.log('資料庫已清除！')
     process.exit(0)
   } catch (err) {
     console.log(err)
