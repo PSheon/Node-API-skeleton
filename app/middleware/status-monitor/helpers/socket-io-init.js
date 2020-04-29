@@ -1,7 +1,10 @@
 /* eslint strict: "off", init-declarations: "off" */
 const socketIo = require('socket.io')
+const auth = require('../../auth')
+const User = require('../../../models/user')
 const gatherOsMetrics = require('./gather-os-metrics')
 const healthChecker = require('./health-checker')
+const jwt = require('jsonwebtoken')
 
 let io
 
@@ -20,21 +23,32 @@ module.exports = (server, config) => {
       io = socketIo(server)
     }
 
-    io.on('connection', (socket) => {
-      if (config.authorize) {
-        config
-          .authorize(socket)
-          .then((authorized) => {
-            if (!authorized) {
-              socket.disconnect('unauthorized')
-            } else {
-              addSocketEvents(socket, config)
+    if (config.authorize) {
+      io.use((socket, next) => {
+        const token = socket.handshake.query.token
+        const JWT_TOKEN = auth.decrypt(token)
+
+        jwt.verify(JWT_TOKEN, process.env.JWT_SECRET, (jwtError, payload) => {
+          if (jwtError) {
+            return next(new Error('[Authentication error] jwt token error.'))
+          }
+
+          // eslint-disable-next-line
+          User.findById(payload.data._id, (userError, user) => {
+            if (userError) {
+              return next(new Error('[Authentication error] user not found.'))
             }
+
+            return next()
           })
-          .catch(() => socket.disconnect('unauthorized'))
-      } else {
-        addSocketEvents(socket, config)
-      }
+
+          return next()
+        })
+      })
+    }
+
+    io.on('connection', (socket) => {
+      addSocketEvents(socket, config)
     })
 
     /* 監控跨度 */

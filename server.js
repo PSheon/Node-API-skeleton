@@ -15,7 +15,6 @@ const FileStreamRotator = require('file-stream-rotator')
 
 const setupDirectory = require('./utils/setup-environment-directory')
 const statusMonitor = require('./app/middleware/status-monitor')
-const statusMonitorConfig = require('./config/statusMonitor')
 const initMongo = require('./config/mongo')
 
 // Setup necessary directory
@@ -26,7 +25,20 @@ app.set('port', process.env.API_PORT || 3000)
 
 // API Status Monitor
 if (process.env.ENABLE_STATUS_MONITOR === 'true') {
-  app.use(statusMonitor(statusMonitorConfig()))
+  app.use(
+    statusMonitor({
+      authorize: true,
+      healthChecks: [
+        {
+          method: 'GET',
+          protocol: 'http',
+          host: 'localhost',
+          path: '/api/cities/all',
+          port: '3000'
+        }
+      ]
+    })
+  )
 }
 
 // API DOCS UI

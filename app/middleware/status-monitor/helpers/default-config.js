@@ -1,6 +1,8 @@
 module.exports = {
   path: '/',
   socketPath: '/socket.io',
+
+  /* 時間跨度 */
   spans: [
     {
       interval: 1,
@@ -15,8 +17,17 @@ module.exports = {
       retention: 60
     }
   ],
+
+  /* Socket 授權 */
+  authorize: true,
+
+  /* Socket 端口 */
   port: null,
+
+  /* Socket 實體 */
   websocket: null,
+
+  /* 顯示圖表 */
   chartVisibility: {
     cpu: true,
     mem: true,
@@ -27,7 +38,13 @@ module.exports = {
     rps: true,
     statusCodes: true
   },
+
+  /* 排除路由 */
   ignoreStartsWith: '/admin',
+
+  /* API 健康度 */
   healthChecks: [],
+
+  /* API 健康度週期，預設 5 分鐘 */
   healthChecksInterval: 300
 }
