@@ -51,7 +51,7 @@ describe('*********** AUTH ***********', () => {
     it('it should GET token', (done) => {
       chai
         .request(server)
-        .post('/login')
+        .post('/auth/login')
         .send(loginDetails)
         .end((err, res) => {
           res.should.have.status(200)
@@ -72,7 +72,7 @@ describe('*********** AUTH ***********', () => {
       }
       chai
         .request(server)
-        .post('/register')
+        .post('/auth/register')
         .send(user)
         .end((err, res) => {
           res.should.have.status(201)
@@ -91,7 +91,7 @@ describe('*********** AUTH ***********', () => {
       }
       chai
         .request(server)
-        .post('/register')
+        .post('/auth/register')
         .send(user)
         .end((err, res) => {
           res.should.have.status(422)
@@ -106,7 +106,7 @@ describe('*********** AUTH ***********', () => {
     it('it should POST verify', (done) => {
       chai
         .request(server)
-        .post('/verify')
+        .post('/auth/verify')
         .send({
           id: verification
         })
@@ -124,7 +124,7 @@ describe('*********** AUTH ***********', () => {
     it('it should POST forgot', (done) => {
       chai
         .request(server)
-        .post('/forgot')
+        .post('/auth/forgot')
         .send({
           email
         })
@@ -142,7 +142,7 @@ describe('*********** AUTH ***********', () => {
     it('it should POST reset', (done) => {
       chai
         .request(server)
-        .post('/reset')
+        .post('/auth/reset')
         .send({
           id: verificationForgot,
           password: '12345'
@@ -160,7 +160,7 @@ describe('*********** AUTH ***********', () => {
     it('it should NOT be able to consume the route since no token was sent', (done) => {
       chai
         .request(server)
-        .get('/token')
+        .get('/auth/token')
         .end((err, res) => {
           res.should.have.status(401)
           done()
@@ -169,7 +169,7 @@ describe('*********** AUTH ***********', () => {
     it('it should GET a fresh token', (done) => {
       chai
         .request(server)
-        .get('/token')
+        .get('/auth/token')
         .set('Authorization', `Bearer ${token}`)
         .end((err, res) => {
           res.should.have.status(200)

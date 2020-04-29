@@ -26,7 +26,7 @@ describe('*********** CITIES ***********', () => {
     it('it should GET token', (done) => {
       chai
         .request(server)
-        .post('/login')
+        .post('/auth/login')
         .send(loginDetails)
         .end((err, res) => {
           res.should.have.status(200)
@@ -42,7 +42,7 @@ describe('*********** CITIES ***********', () => {
     it('it should NOT be able to consume the route since no token was sent', (done) => {
       chai
         .request(server)
-        .get('/cities')
+        .get('/api/cities')
         .end((err, res) => {
           res.should.have.status(401)
           done()
@@ -51,7 +51,7 @@ describe('*********** CITIES ***********', () => {
     it('it should GET all the cities', (done) => {
       chai
         .request(server)
-        .get('/cities')
+        .get('/api/cities')
         .set('Authorization', `Bearer ${token}`)
         .end((err, res) => {
           res.should.have.status(200)
@@ -63,7 +63,7 @@ describe('*********** CITIES ***********', () => {
     it('it should GET the cities with filters', (done) => {
       chai
         .request(server)
-        .get('/cities?filter=Bucaramanga&fields=name')
+        .get('/api/cities?filter=Bucaramanga&fields=name')
         .set('Authorization', `Bearer ${token}`)
         .end((err, res) => {
           res.should.have.status(200)
@@ -81,7 +81,7 @@ describe('*********** CITIES ***********', () => {
       const city = {}
       chai
         .request(server)
-        .post('/cities')
+        .post('/api/cities')
         .set('Authorization', `Bearer ${token}`)
         .send(city)
         .end((err, res) => {
@@ -97,7 +97,7 @@ describe('*********** CITIES ***********', () => {
       }
       chai
         .request(server)
-        .post('/cities')
+        .post('/api/cities')
         .set('Authorization', `Bearer ${token}`)
         .send(city)
         .end((err, res) => {
@@ -114,7 +114,7 @@ describe('*********** CITIES ***********', () => {
       }
       chai
         .request(server)
-        .post('/cities')
+        .post('/api/cities')
         .set('Authorization', `Bearer ${token}`)
         .send(city)
         .end((err, res) => {
@@ -131,7 +131,7 @@ describe('*********** CITIES ***********', () => {
       const id = createdID.slice(-1).pop()
       chai
         .request(server)
-        .get(`/cities/${id}`)
+        .get(`/api/cities/${id}`)
         .set('Authorization', `Bearer ${token}`)
         .end((error, res) => {
           res.should.have.status(200)
@@ -148,7 +148,7 @@ describe('*********** CITIES ***********', () => {
       const id = createdID.slice(-1).pop()
       chai
         .request(server)
-        .patch(`/cities/${id}`)
+        .patch(`/api/cities/${id}`)
         .set('Authorization', `Bearer ${token}`)
         .send({
           name: newName
@@ -167,7 +167,7 @@ describe('*********** CITIES ***********', () => {
       }
       chai
         .request(server)
-        .post('/cities')
+        .post('/api/cities')
         .set('Authorization', `Bearer ${token}`)
         .send(city)
         .end((err, res) => {
@@ -181,7 +181,7 @@ describe('*********** CITIES ***********', () => {
           }
           chai
             .request(server)
-            .patch(`/cities/${createdID.slice(-1).pop()}`)
+            .patch(`/api/cities/${createdID.slice(-1).pop()}`)
             .set('Authorization', `Bearer ${token}`)
             .send(anotherCity)
             .end((error, result) => {
@@ -201,7 +201,7 @@ describe('*********** CITIES ***********', () => {
       }
       chai
         .request(server)
-        .post('/cities')
+        .post('/api/cities')
         .set('Authorization', `Bearer ${token}`)
         .send(city)
         .end((err, res) => {
@@ -211,7 +211,7 @@ describe('*********** CITIES ***********', () => {
           res.body.should.have.property('name').eql(name)
           chai
             .request(server)
-            .delete(`/cities/${res.body._id}`)
+            .delete(`/api/cities/${res.body._id}`)
             .set('Authorization', `Bearer ${token}`)
             .end((error, result) => {
               result.should.have.status(200)
