@@ -12,9 +12,9 @@
     "mocha": "nyc mocha --timeout=5000 --exit",
     "test": "npm run fresh && npm run mocha",
     "dev": "cross-env NODE_ENV=development nodemon server.js",
-    "fresh": "npm run clean && npm run seed",
-    "clean": "node clean.js",
-    "seed": "node seed.js",
+    "fresh-db": "npm run clean && npm run seed",
+    "clean-db": "node clean.js",
+    "seed-db": "node seed.js",
     "format": "prettier --write --config .prettierrc.json \"**/*.js\"",
     "lint": "eslint --fix --config .eslintrc.json \"**/*.js\"",
     "remark": "remark . -o"
