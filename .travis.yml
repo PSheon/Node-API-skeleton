@@ -1,6 +1,7 @@
-dist: xenial
+dist: bionic
 language: node_js
 node_js:
+  - '10'
   - '12'
 cache:
   npm: true
@@ -10,12 +11,10 @@ before_script:
   - cp .env.example .env
 env:
   - NODE_ENV=test
-if: tag IS present
 deploy:
-  provider: npm
-  email: $NPM_EMAIL
-  api_key: $NPM_DEPLOY_TOKEN
+  provider: heroku
+  api_key: $HEROKU_DEPLOY_TOKEN
+  app: node-api-skeleton
   on:
     branch: master
     tags: true
-    repo: davellanedam/node-express-mongodb-jwt-rest-api-skeleton
