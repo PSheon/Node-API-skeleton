@@ -18,9 +18,6 @@ module.exports = {
     }
   ],
 
-  /* Socket 授權 */
-  authorize: true,
-
   /* Socket 端口 */
   port: null,
 

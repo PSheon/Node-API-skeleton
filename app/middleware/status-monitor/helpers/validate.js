@@ -1,6 +1,5 @@
 const defaultConfig = require('./default-config')
 
-/* eslint complexity: ["error", 12] */
 module.exports = (config) => {
   if (!config) {
     return defaultConfig
@@ -23,10 +22,6 @@ module.exports = (config) => {
       : defaultConfig.socketPath
   config.spans =
     typeof config.spans === 'object' ? config.spans : defaultConfig.spans
-  config.authorize =
-    typeof config.authorize === 'boolean'
-      ? config.authorize
-      : defaultConfig.authorize
   config.port =
     typeof config.port === 'number' ? config.port : defaultConfig.port
   config.websocket =

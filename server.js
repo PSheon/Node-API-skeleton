@@ -14,12 +14,18 @@ const swaggerUi = require('swagger-ui-express')
 const FileStreamRotator = require('file-stream-rotator')
 
 const setupDirectory = require('./utils/setup-environment-directory')
+const setupSocket = require('./utils/setup-socket')
 const statusMonitor = require('./app/middleware/status-monitor')
 const initMongo = require('./config/mongo')
 
+const Server = require('http').createServer(app)
+const Socket = setupSocket({
+  server: Server,
+  authorize: true
+})
+
 // Setup necessary directory
 setupDirectory({ baseDirName: __dirname })
-
 // Setup express server port from ENV, default: 3000
 app.set('port', process.env.API_PORT || 3000)
 
@@ -27,14 +33,14 @@ app.set('port', process.env.API_PORT || 3000)
 if (process.env.ENABLE_STATUS_MONITOR === 'true') {
   app.use(
     statusMonitor({
-      authorize: true,
+      websocket: Socket,
       healthChecks: [
         {
           method: 'GET',
           protocol: 'http',
           host: 'localhost',
-          path: '/api/cities/all',
-          port: '3000'
+          port: '3000',
+          path: '/api/cities/all'
         }
       ]
     })
@@ -124,7 +130,8 @@ app.set('views', path.join(__dirname, 'views'))
 app.engine('html', require('ejs').renderFile)
 app.set('view engine', 'html')
 app.use(require('./app/routes'))
-app.listen(app.get('port'))
+Server.listen(app.get('port'))
+// app.listen(app.get('port'))
 
 // Init MongoDB
 initMongo()
