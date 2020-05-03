@@ -40,9 +40,9 @@ exports.handleError = (res, err) => {
     console.log(err)
   }
   // Sends error to user
-  res.status(err.code).json({
+  res.status(err.code || 500).json({
     errors: {
-      msg: err.message
+      msg: err.message || '發生未預期的狀況.'
     }
   })
 }
