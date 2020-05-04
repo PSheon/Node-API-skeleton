@@ -13,8 +13,6 @@ env:
   - NODE_ENV=test
 deploy:
   provider: heroku
-  api_key: $HEROKU_DEPLOY_TOKEN
+  api_key:
+    secure: $HEROKU_DEPLOY_TOKEN
   app: node-api-skeleton
-  on:
-    branch: master
-    tags: true
