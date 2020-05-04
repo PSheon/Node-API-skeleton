@@ -3,7 +3,7 @@ const validate = require('../controllers/apps.validate')
 const AuthController = require('../controllers/auth')
 const express = require('express')
 const router = express.Router()
-require('../../config/passport')
+require('../../utils/setup-passport')
 const passport = require('passport')
 const requireAuth = passport.authenticate('jwt', {
   session: false
@@ -41,7 +41,7 @@ router.get(
  * Get item route
  */
 router.get(
-  '/:id',
+  '/:appId',
   requireAuth,
   AuthController.roleAuthorization(['admin']),
   trimRequest.all,
@@ -53,7 +53,7 @@ router.get(
  * Get item logs route
  */
 router.get(
-  '/:id/:instanceId/logs',
+  '/:appId/:instanceId/logs',
   requireAuth,
   AuthController.roleAuthorization(['admin']),
   trimRequest.all,
@@ -66,7 +66,7 @@ router.get(
  * Manage process status. start, restart, reload...etc
  */
 router.patch(
-  '/:id',
+  '/:appId',
   requireAuth,
   AuthController.roleAuthorization(['admin']),
   trimRequest.all,

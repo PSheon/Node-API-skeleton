@@ -2,7 +2,7 @@ const _fs = require('fs')
 const pm = require('pm2')
 const bluebird = require('bluebird')
 
-const TYPES = require('../shared/types')
+const TYPES = require('../../types/app-manager')
 const fs = bluebird.promisifyAll(_fs)
 
 const getList = () =>
@@ -74,6 +74,14 @@ const getLogs = async (pmId) => {
   return response
 }
 
+// TODO
+const startApp = (scriptPath, scriptConfig) =>
+  new Promise((resolve, reject) =>
+    pm.start(scriptPath, scriptConfig, (err, proc) =>
+      err ? reject(err) : resolve(proc)
+    )
+  )
+
 const stopApp = (name) =>
   new Promise((resolve, reject) =>
     pm.stop(name, (err) => (err ? reject(err) : resolve()))
@@ -99,6 +107,8 @@ module.exports = {
   getApp,
   getDescription,
   getLogs,
+  // TODO
+  startApp,
   stopApp,
   restartApp,
   reloadApp,

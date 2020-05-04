@@ -9,7 +9,7 @@ const {
   reloadApp,
   restartApp
 } = require('../../utils/app-manager')
-const { AppAction } = require('../../shared/app-manager/types')
+const { AppAction } = require('../../types/app-manager')
 
 /*********************
  * Private functions *
@@ -62,8 +62,8 @@ exports.getItem = async (req, res) => {
   try {
     req = matchedData(req)
 
-    const id = req.id
-    res.status(200).json(await getApp(id))
+    const appId = req.appId
+    res.status(200).json(await getApp(appId))
   } catch (error) {
     utils.handleError(res, error)
   }
@@ -78,10 +78,10 @@ exports.getItemLogs = async (req, res) => {
   try {
     req = matchedData(req)
 
-    const { id, instanceId } = req
+    const { appId, instanceId } = req
     const { app, output, error } = await getLogs(instanceId)
 
-    if (app.name !== id) {
+    if (app.name !== appId) {
       res.status(500).json({
         message: '應用程序名稱和 PM2 識別器不相同.'
       })
@@ -102,7 +102,7 @@ exports.getItemLogs = async (req, res) => {
 exports.updateItem = async (req, res) => {
   try {
     req = matchedData(req)
-    const { id, action } = req
+    const { appId, action } = req
 
     const actions = {
       [AppAction.DELETE]: deleteApp,
@@ -114,7 +114,7 @@ exports.updateItem = async (req, res) => {
 
     const fn = actions[action]
 
-    await fn(id)
+    await fn(appId)
     res.status(200).json({ status: 'Succeed' })
   } catch (error) {
     utils.handleError(res, error)

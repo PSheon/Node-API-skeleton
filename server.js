@@ -14,9 +14,16 @@ const swaggerUi = require('swagger-ui-express')
 const FileStreamRotator = require('file-stream-rotator')
 
 const setupDirectory = require('./utils/setup-environment-directory')
+const setupQueueManager = require('./utils/queue-manager')
+// TODO
+const { UI: bullBoardUI } = require('bull-board')
+const { echoAppQueue } = require('./utils/queue-manager/queues')
+const { startApp } = require('./utils/app-manager')
+const echoAppConnfig = require('./utils/app-manager/echo-app-config')
+
+const setupMongo = require('./utils/setup-mongo')
 const setupSocket = require('./utils/setup-socket')
 const statusMonitor = require('./app/middleware/status-monitor')
-const initMongo = require('./config/mongo')
 
 const Server = require('http').createServer(app)
 const Socket = setupSocket({
@@ -28,6 +35,16 @@ const Socket = setupSocket({
 setupDirectory({ baseDirName: __dirname })
 // Setup express server port from ENV, default: 3000
 app.set('port', process.env.API_PORT || 3000)
+
+// TODO
+// APP Process Queue Manager
+setupQueueManager()
+app.use('/queue-dashboard', bullBoardUI)
+setTimeout(async () => {
+  echoAppQueue.add({ image: 'http://example.com/image1.tiff' })
+  const proc = await startApp('./app-stacks/echo-app.js', echoAppConnfig())
+  console.log('proc, ', proc)
+}, 3000)
 
 // API Status Monitor
 if (process.env.ENABLE_STATUS_MONITOR === 'true') {
@@ -134,6 +151,6 @@ Server.listen(app.get('port'))
 // app.listen(app.get('port'))
 
 // Init MongoDB
-initMongo()
+setupMongo()
 
 module.exports = app // for testing

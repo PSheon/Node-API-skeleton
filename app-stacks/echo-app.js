@@ -1,3 +1,3 @@
 setInterval(() => {
-  console.log('test')
+  console.log('echo')
 }, 3000)

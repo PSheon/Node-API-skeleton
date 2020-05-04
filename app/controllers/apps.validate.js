@@ -1,7 +1,7 @@
 const { validationResult } = require('../middleware/utils')
 const { check } = require('express-validator')
 
-const TYPES = require('../../shared/app-manager/types')
+const TYPES = require('../../types/app-manager')
 
 /**
  * Validates create new item request
@@ -30,7 +30,7 @@ exports.updateItem = [
     .isEmpty()
     .isIn(Object.values(TYPES.AppAction))
     .withMessage('IS_EMPTY'),
-  check('id')
+  check('appId')
     .exists()
     .withMessage('MISSING')
     .not()
@@ -45,7 +45,7 @@ exports.updateItem = [
  * Validates get item request
  */
 exports.getItem = [
-  check('id')
+  check('appId')
     .exists()
     .withMessage('MISSING')
     .not()
@@ -60,7 +60,7 @@ exports.getItem = [
  * Validates get item logs request
  */
 exports.getItemLogs = [
-  check('id')
+  check('appId')
     .exists()
     .withMessage('MISSING')
     .not()
@@ -81,7 +81,7 @@ exports.getItemLogs = [
  * Validates delete item request
  */
 exports.deleteItem = [
-  check('id')
+  check('appId')
     .exists()
     .withMessage('MISSING')
     .not()
