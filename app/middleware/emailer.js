@@ -1,3 +1,4 @@
+const PROCESS_ENV = require('config')
 const nodemailer = require('nodemailer')
 const mg = require('nodemailer-mailgun-transport')
 const i18n = require('i18n')
@@ -13,13 +14,13 @@ const sendEmail = async (data, callback) => {
   const auth = {
     auth: {
       // eslint-disable-next-line camelcase
-      api_key: process.env.EMAIL_SMTP_API_MAILGUN,
-      domain: process.env.EMAIL_SMTP_DOMAIN_MAILGUN
+      api_key: PROCESS_ENV.EMAIL_SMTP_API_MAILGUN,
+      domain: PROCESS_ENV.EMAIL_SMTP_DOMAIN_MAILGUN
     }
   }
   const transporter = nodemailer.createTransport(mg(auth))
   const mailOptions = {
-    from: `${process.env.EMAIL_FROM_NAME} <${process.env.EMAIL_FROM_ADDRESS}>`,
+    from: `${PROCESS_ENV.EMAIL_FROM_NAME} <${PROCESS_ENV.EMAIL_FROM_ADDRESS}>`,
     to: `${data.user.name} <${data.user.email}>`,
     subject: data.subject,
     html: data.htmlMessage
@@ -112,7 +113,7 @@ module.exports = {
     const htmlMessage = i18n.__(
       'registration.MESSAGE',
       user.name,
-      process.env.FRONTEND_URL,
+      PROCESS_ENV.FRONTEND_URL,
       user.verification
     )
     prepareToSendEmail(user, subject, htmlMessage)
@@ -129,7 +130,7 @@ module.exports = {
     const htmlMessage = i18n.__(
       'forgotPassword.MESSAGE',
       user.email,
-      process.env.FRONTEND_URL,
+      PROCESS_ENV.FRONTEND_URL,
       user.verification
     )
     prepareToSendEmail(user, subject, htmlMessage)

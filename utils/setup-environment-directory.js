@@ -1,3 +1,4 @@
+const PROCESS_ENV = require('config')
 const fs = require('fs')
 const path = require('path')
 
@@ -14,14 +15,14 @@ module.exports = ({ baseDirName }) => {
   }
 
   if (
-    process.env.ENABLE_DOCS_UI === 'true' &&
+    PROCESS_ENV.ENABLE_DOCS_UI &&
     !fs.existsSync(path.join(baseDirName, 'docs'))
   ) {
     fs.mkdirSync(path.join(baseDirName, 'docs'))
   }
 
   if (
-    process.env.ENABLE_LOG_RECORDER === 'true' &&
+    PROCESS_ENV.ENABLE_LOG_RECORDER &&
     !fs.existsSync(path.join(baseDirName, 'logs'))
   ) {
     fs.mkdirSync(path.join(baseDirName, 'logs'))

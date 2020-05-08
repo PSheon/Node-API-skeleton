@@ -1,4 +1,3 @@
-require('dotenv-safe').config()
 const setupMongo = require('../../utils/setup-mongo')
 const path = require('path')
 const fs = require('fs')

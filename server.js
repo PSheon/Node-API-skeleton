@@ -1,4 +1,4 @@
-require('dotenv-safe').config()
+const PROCESS_ENV = require('config')
 const express = require('express')
 const bodyParser = require('body-parser')
 const morgan = require('morgan')
@@ -31,23 +31,8 @@ const Socket = setupSocket({
   authorize: true
 })
 
-// Setup necessary directory
-setupDirectory({ baseDirName: __dirname })
-// Setup express server port from ENV, default: 3000
-app.set('port', process.env.API_PORT || 3000)
-
-// TODO
-// APP Process Queue Manager
-setupQueueManager()
-app.use('/queue-dashboard', bullBoardUI)
-setTimeout(async () => {
-  echoAppQueue.add({ image: 'http://example.com/image1.tiff' })
-  const proc = await startApp('./app-stacks/echo-app.js', echoAppConnfig())
-  console.log('proc, ', proc)
-}, 3000)
-
 // API Status Monitor
-if (process.env.ENABLE_STATUS_MONITOR === 'true') {
+if (PROCESS_ENV.ENABLE_STATUS_MONITOR) {
   app.use(
     statusMonitor({
       websocket: Socket,
@@ -65,7 +50,7 @@ if (process.env.ENABLE_STATUS_MONITOR === 'true') {
 }
 
 // API DOCS UI
-if (process.env.ENABLE_DOCS_UI === 'true') {
+if (PROCESS_ENV.ENABLE_DOCS_UI) {
   app.use(
     '/api-docs',
     swaggerUi.serve,
@@ -85,9 +70,7 @@ if (process.env.ENABLE_DOCS_UI === 'true') {
 }
 
 // Enable only in development HTTP request logger middleware
-if (process.env.NODE_ENV === 'development') {
-  app.use(morgan('dev'))
-} else if (process.env.ENABLE_LOG_RECORDER === 'true') {
+if (process.env.NODE_ENV === 'production') {
   app.use(
     morgan('combined', {
       stream: FileStreamRotator.getStream({
@@ -98,17 +81,19 @@ if (process.env.NODE_ENV === 'development') {
       })
     })
   )
+} else if (PROCESS_ENV.ENABLE_LOG_RECORDER) {
+  app.use(morgan('dev'))
 }
 
 // Redis cache enabled by env variable
-if (process.env.USE_REDIS === 'true') {
+if (PROCESS_ENV.ENABLE_REDIS_CACHE) {
   const getExpeditiousCache = require('express-expeditious')
   const cache = getExpeditiousCache({
-    namespace: 'expresscache',
+    namespace: 'RedisCache',
     defaultTtl: '1 minute',
     engine: require('expeditious-engine-redis')({
-      host: process.env.REDIS_HOST,
-      port: process.env.REDIS_PORT
+      host: PROCESS_ENV.REDIS_HOST,
+      port: PROCESS_ENV.REDIS_PORT
     })
   })
   app.use(cache)
@@ -147,10 +132,24 @@ app.set('views', path.join(__dirname, 'views'))
 app.engine('html', require('ejs').renderFile)
 app.set('view engine', 'html')
 app.use(require('./app/routes'))
-Server.listen(app.get('port'))
-// app.listen(app.get('port'))
+Server.listen(PROCESS_ENV.API_PORT)
 
-// Init MongoDB
+// Setup process environment
+// TODO
+// Setup necessary directory
+setupDirectory({ baseDirName: __dirname })
+
+// TODO
+// APP Process Queue Manager
+setupQueueManager()
+app.use('/queue-dashboard', bullBoardUI)
+setTimeout(async () => {
+  // echoAppQueue.add({ image: 'http://example.com/image1.tiff' })
+  // const proc = await startApp('./app-stacks/echo-app.js', echoAppConnfig())
+  // console.log('proc, ', proc)
+}, 3000)
+
+// Setup MongoDB connection
 setupMongo()
 
 module.exports = app // for testing

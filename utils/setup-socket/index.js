@@ -1,3 +1,4 @@
+const PROCESS_ENV = require('config')
 const socketIo = require('socket.io')
 const jwt = require('jsonwebtoken')
 const validate = require('./helpers/validate')
@@ -13,7 +14,7 @@ module.exports = (config) => {
       const token = socket.handshake.query.token
       const JWT_TOKEN = auth.decrypt(token)
 
-      jwt.verify(JWT_TOKEN, process.env.JWT_SECRET, (jwtError, payload) => {
+      jwt.verify(JWT_TOKEN, PROCESS_ENV.JWT_SECRET, (jwtError, payload) => {
         if (jwtError) {
           return next(
             new Error('[Authentication error] socket jwt token error.')

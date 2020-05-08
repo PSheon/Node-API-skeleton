@@ -1,5 +1,5 @@
+const PROCESS_ENV = require('config')
 const mongoose = require('mongoose')
-const DB_URL = process.env.MONGO_URI
 const loadModels = require('../app/models')
 
 module.exports = () => {
@@ -7,7 +7,7 @@ module.exports = () => {
     mongoose.Promise = global.Promise
 
     mongoose.connect(
-      DB_URL,
+      PROCESS_ENV.MONGO_URI,
       {
         keepAlive: true,
         useNewUrlParser: true,
@@ -23,7 +23,7 @@ module.exports = () => {
           // Prints initialization
           console.log('****************************')
           console.log('*    Starting Server')
-          console.log(`*    Port: ${process.env.PORT || 3000}`)
+          console.log(`*    Port: ${PROCESS_ENV.PORT || 3000}`)
           console.log(`*    NODE_ENV: ${process.env.NODE_ENV}`)
           console.log(`*    Database: MongoDB`)
           console.log(dbStatus)
