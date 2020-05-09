@@ -21,9 +21,6 @@ module.exports = {
   /* Socket 端口 */
   port: null,
 
-  /* Socket 實體 */
-  websocket: null,
-
   /* 顯示圖表 */
   chartVisibility: {
     cpu: true,

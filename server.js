@@ -13,64 +13,59 @@ const swaggerJsdoc = require('swagger-jsdoc')
 const swaggerUi = require('swagger-ui-express')
 const FileStreamRotator = require('file-stream-rotator')
 
-const setupDirectory = require('./utils/setup-environment-directory')
-const setupQueueManager = require('./utils/queue-manager')
+const setupBanner = require('./utils/setup/banner')
+const setupConfigChecker = require('./utils/setup/config-checker')
+const setupDirectory = require('./utils/setup/environment-directory')
+const setupSocket = require('./utils/setup/socket')
+const setupMongo = require('./utils/setup/mongo')
+
+const { AppManager } = require('./plugins/app-manager')
+const { QueueManager } = require('./plugins/queue-manager')
+const { StatusMonitor } = require('./plugins/status-monitor')
 // TODO
 const { UI: bullBoardUI } = require('bull-board')
-const { echoAppQueue } = require('./utils/queue-manager/queues')
-const { startApp } = require('./utils/app-manager')
-const echoAppConnfig = require('./utils/app-manager/echo-app-config')
-
-const setupMongo = require('./utils/setup-mongo')
-const setupSocket = require('./utils/setup-socket')
-const statusMonitor = require('./app/middleware/status-monitor')
+// const { echoAppQueue } = require('./plugins/queue-manager/queues')
+// const { startApp } = require('./plugins/app-manager')
+// const echoAppConnfig = require('./plugins/app-manager/echo-app-config')
 
 const Server = require('http').createServer(app)
+
+/* Setup Banner information */
+setupBanner()
+/* Setup process environment */
+// TODO
+setupConfigChecker(PROCESS_ENV)
+/* Setup necessary directory */
+setupDirectory({ baseDirName: __dirname })
+/* Setup Socket server */
 const Socket = setupSocket({
   server: Server,
-  authorize: true
+  authorize: PROCESS_ENV.ENABLE_SOCKET_AUTH
 })
+/* Setup MongoDB connection */
+setupMongo()
 
-// API Status Monitor
+/* API Status Monitor */
 if (PROCESS_ENV.ENABLE_STATUS_MONITOR) {
-  app.use(
-    statusMonitor({
-      websocket: Socket,
-      healthChecks: [
-        {
-          method: 'GET',
-          protocol: 'http',
-          host: 'localhost',
-          port: '3000',
-          path: '/api/cities/all'
-        }
-      ]
-    })
-  )
+  StatusMonitor(Socket, PROCESS_ENV.STATUS_MONITOR_CONFIG)
 }
 
-// API DOCS UI
-if (PROCESS_ENV.ENABLE_DOCS_UI) {
+/* API DOCS Swagger UI */
+if (PROCESS_ENV.ENABLE_SWAGGER_DOCS_UI) {
   app.use(
-    '/api-docs',
+    PROCESS_ENV.SWAGGER_UI_ROUTE_PATH,
     swaggerUi.serve,
     swaggerUi.setup(
       swaggerJsdoc({
-        swaggerDefinition: {
-          info: {
-            title: 'API Skeleton',
-            version: '1.0.0',
-            description: 'Generate API document with swagger'
-          }
-        },
+        swaggerDefinition: PROCESS_ENV.SWAGGER_DEFINITION,
         apis: ['./docs/*.yaml']
       })
     )
   )
 }
 
-// Enable only in development HTTP request logger middleware
-if (process.env.NODE_ENV === 'production') {
+/* Enable only in development HTTP request logger middleware */
+if (process.env.NODE_ENV === 'production' && PROCESS_ENV.ENABLE_LOG_RECORDER) {
   app.use(
     morgan('combined', {
       stream: FileStreamRotator.getStream({
@@ -81,15 +76,15 @@ if (process.env.NODE_ENV === 'production') {
       })
     })
   )
-} else if (PROCESS_ENV.ENABLE_LOG_RECORDER) {
+} else {
   app.use(morgan('dev'))
 }
 
-// Redis cache enabled by env variable
+/* Redis cache enabled by env variable */
 if (PROCESS_ENV.ENABLE_REDIS_CACHE) {
   const getExpeditiousCache = require('express-expeditious')
   const cache = getExpeditiousCache({
-    namespace: 'RedisCache',
+    namespace: PROCESS_ENV.REDIS_NAMESPACE,
     defaultTtl: '1 minute',
     engine: require('expeditious-engine-redis')({
       host: PROCESS_ENV.REDIS_HOST,
@@ -99,13 +94,13 @@ if (PROCESS_ENV.ENABLE_REDIS_CACHE) {
   app.use(cache)
 }
 
-// for parsing json
+/* for parsing json */
 app.use(
   bodyParser.json({
     limit: '20mb'
   })
 )
-// for parsing application/x-www-form-urlencoded
+/* for parsing application/x-www-form-urlencoded */
 app.use(
   bodyParser.urlencoded({
     limit: '20mb',
@@ -113,7 +108,7 @@ app.use(
   })
 )
 
-// i18n
+/* Internationalization */
 i18n.configure({
   locales: ['en', 'es'],
   directory: `${__dirname}/locales`,
@@ -122,7 +117,7 @@ i18n.configure({
 })
 app.use(i18n.init)
 
-// Init all other stuff
+/* Init all other stuff */
 app.use(cors())
 app.use(passport.initialize())
 app.use(compression())
@@ -134,22 +129,15 @@ app.set('view engine', 'html')
 app.use(require('./app/routes'))
 Server.listen(PROCESS_ENV.API_PORT)
 
-// Setup process environment
+/* Plugins */
+AppManager()
 // TODO
-// Setup necessary directory
-setupDirectory({ baseDirName: __dirname })
-
-// TODO
-// APP Process Queue Manager
-setupQueueManager()
+QueueManager()
 app.use('/queue-dashboard', bullBoardUI)
 setTimeout(async () => {
   // echoAppQueue.add({ image: 'http://example.com/image1.tiff' })
   // const proc = await startApp('./app-stacks/echo-app.js', echoAppConnfig())
   // console.log('proc, ', proc)
 }, 3000)
-
-// Setup MongoDB connection
-setupMongo()
 
 module.exports = app // for testing

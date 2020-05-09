@@ -5,7 +5,7 @@ module.exports = (config) => {
     return defaultConfig
   }
 
-  const mungeChartVisibility = (configChartVisibility) => {
+  const mergeChartVisibility = (configChartVisibility) => {
     Object.keys(defaultConfig.chartVisibility).forEach((key) => {
       if (configChartVisibility[key] === false) {
         defaultConfig.chartVisibility[key] = false
@@ -24,13 +24,9 @@ module.exports = (config) => {
     typeof config.spans === 'object' ? config.spans : defaultConfig.spans
   config.port =
     typeof config.port === 'number' ? config.port : defaultConfig.port
-  config.websocket =
-    typeof config.websocket === 'object'
-      ? config.websocket
-      : defaultConfig.websocket
   config.chartVisibility =
     typeof config.chartVisibility === 'object'
-      ? mungeChartVisibility(config.chartVisibility)
+      ? mergeChartVisibility(config.chartVisibility)
       : defaultConfig.chartVisibility
   config.ignoreStartsWith =
     typeof config.path === 'string'

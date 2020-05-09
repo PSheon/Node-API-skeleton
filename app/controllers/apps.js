@@ -8,7 +8,7 @@ const {
   deleteApp,
   reloadApp,
   restartApp
-} = require('../../utils/app-manager')
+} = require('../../plugins/app-manager')
 const { AppAction } = require('../../types/app-manager')
 
 /*********************

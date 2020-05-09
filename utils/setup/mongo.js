@@ -1,6 +1,6 @@
 const PROCESS_ENV = require('config')
 const mongoose = require('mongoose')
-const loadModels = require('../app/models')
+const loadModels = require('../../app/models')
 
 module.exports = () => {
   const connect = () => {
