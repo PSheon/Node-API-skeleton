@@ -2,7 +2,7 @@ const _fs = require('fs')
 const pm = require('pm2')
 const bluebird = require('bluebird')
 
-const TYPES = require('../../types/app-manager')
+const TYPES = require('../../../types/app-manager')
 const fs = bluebird.promisifyAll(_fs)
 
 const getList = () =>

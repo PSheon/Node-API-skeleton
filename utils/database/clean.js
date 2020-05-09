@@ -1,5 +1,4 @@
-require('dotenv-safe').config()
-const setupMongo = require('../../utils/setup-mongo')
+const setupMongo = require('../setup/mongo')
 const path = require('path')
 const fs = require('fs')
 const { removeExtensionFromFile } = require('../../app/middleware/utils')

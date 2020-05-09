@@ -1,6 +1,7 @@
+const PROCESS_ENV = require('config')
 const passport = require('passport')
-const User = require('../app/models/user')
-const auth = require('../app/middleware/auth')
+const User = require('../../app/models/user')
+const auth = require('../../app/middleware/auth')
 const JwtStrategy = require('passport-jwt').Strategy
 
 /**
@@ -29,7 +30,7 @@ const jwtExtractor = (req) => {
  */
 const jwtOptions = {
   jwtFromRequest: jwtExtractor,
-  secretOrKey: process.env.JWT_SECRET
+  secretOrKey: PROCESS_ENV.JWT_SECRET
 }
 
 /**

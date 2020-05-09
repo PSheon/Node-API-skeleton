@@ -1,5 +1,4 @@
 /* eslint strict: "off", init-declarations: "off" */
-const socketIo = require('socket.io')
 const gatherOsMetrics = require('./gather-os-metrics')
 const healthChecker = require('./health-checker')
 
@@ -12,13 +11,9 @@ const addSocketEvents = (socket, config) => {
   })
 }
 
-module.exports = (server, config) => {
+module.exports = (websocket, config) => {
   if (io === null || io === undefined) {
-    if (config.websocket !== null) {
-      io = config.websocket
-    } else {
-      io = socketIo(server)
-    }
+    io = websocket
 
     io.on('connection', (socket) => {
       addSocketEvents(socket, config)

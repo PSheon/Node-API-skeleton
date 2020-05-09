@@ -1,5 +1,8 @@
 .DS_Store
 
+# Uploads
+uploads
+
 # Logs
 logs
 *.log
@@ -57,15 +60,15 @@ typings/
 .yarn-integrity
 
 # dotenv environment variables file
-.env
+# ignore production configuration
+config/development.js
+config/test.js
+config/production.js
 
 # next.js build output
 .next
 
 # don't ignore keep files
 !.gitkeep
-
-# ignore production configuration
-.env.production
 
 .history/

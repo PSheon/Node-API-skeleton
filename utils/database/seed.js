@@ -1,8 +1,8 @@
-require('dotenv-safe').config()
+const PROCESS_ENV = require('config')
 const { Seeder } = require('mongo-seeding')
 const path = require('path')
 const config = {
-  database: process.env.MONGO_URI,
+  database: PROCESS_ENV.MONGO_URI,
   inputPath: path.resolve(__dirname, 'utils', 'database', 'data'),
   dropDatabase: false
 }

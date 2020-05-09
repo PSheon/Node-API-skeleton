@@ -1,10 +1,14 @@
+const PROCESS_ENV = require('config')
+const ora = require('ora')
+const chalk = require('chalk')
 const socketIo = require('socket.io')
 const jwt = require('jsonwebtoken')
 const validate = require('./helpers/validate')
-const auth = require('../../app/middleware/auth')
-const User = require('../../app/models/user')
+const auth = require('../../../app/middleware/auth')
+const User = require('../../../app/models/user')
 
 module.exports = (config) => {
+  const spinner = new ora('檢查 Socket 連線...').start()
   const validatedConfig = validate(config)
   const io = socketIo(validatedConfig.server)
 
@@ -13,7 +17,7 @@ module.exports = (config) => {
       const token = socket.handshake.query.token
       const JWT_TOKEN = auth.decrypt(token)
 
-      jwt.verify(JWT_TOKEN, process.env.JWT_SECRET, (jwtError, payload) => {
+      jwt.verify(JWT_TOKEN, PROCESS_ENV.JWT_SECRET, (jwtError, payload) => {
         if (jwtError) {
           return next(
             new Error('[Authentication error] socket jwt token error.')
@@ -36,5 +40,6 @@ module.exports = (config) => {
     })
   }
 
+  spinner.succeed(`${chalk.green('[3/3]')} Socket 連線正常`)
   return io
 }
